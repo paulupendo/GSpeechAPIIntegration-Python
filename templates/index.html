@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>SpeechApp</title>
+    </head>
+    <body>
+        <h1>Registration</h1>
+        <form action="/api/user_registration" method="post">
+            <table>
+                <tr>
+                    <th>User Id</th>
+                    <td><input type="text" name="id" placeholder="Enter User Id"></td>
+                </tr>
+                <tr>
+                    <th>User Name</th>
+                    <td><input type="text" name="name" placeholder="Enter User Id"></td>
+                </tr>
+                <tr>
+                    <th>User Email</th>
+                    <td><input type="text" name="email" placeholder="Enter User Id"></td>
+                </tr>
+                <tr>
+                    <th>User Password</th>
+                    <td><input type="password" name="password" placeholder="Enter User Id"></td>
+                </tr>
+                <tr>
+                    <td><input type="Submit" name="submit" value="Registration"></td>
+                </tr>
+            </table>
+        </form>
+
+    <!--=========================== [ Login ] =================================-->
+        <h1>Login</h1>
+        <form action="/api/user_login" method="post">
+            <table>
+                <tr>
+                    <th>User Email</th>
+                    <td><input type="text" name="email" placeholder="Enter User Id"></td>
+                </tr>
+                <tr>
+                    <th>User Password</th>
+                    <td><input type="password" name="password" placeholder="Enter User Id"></td>
+                </tr>
+                <tr>
+                    <td><input type="Submit" name="submit" value="Login"></td>
+                </tr>
+            </table>
+        </form>
+
+    <!--=========================== [ csv ] =================================-->
+        <h1>Csv upload</h1>
+        <form action="/api/add_study" method="post" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <td><b>csv</b></td>
+                    <td><input type="file" name="study_file" value="study_file" /></td>
+                </tr>
+                <tr>
+                    <td><input type="Submit" name="submit" value="upload"></td>
+                </tr>
+            </table>
+        </form>
+
+    <!--=========================== [ Recording ] =================================-->
+        <h1>Add Recording</h1>
+        <form action="/api/add_recording" method="post" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <th>Id</th>
+                    <td><input type="text" name="id" placeholder="Enter paragraph Id"></td>
+                </tr>
+                <tr>
+                    <th>User Id</th>
+                    <td><input type="text" name="user_id" placeholder="Enter Paragraph"></td>
+                </tr>
+                <tr>
+                    <th>Study Id</th>
+                    <td><input type="text" name="study_id" placeholder="Enter User Id"></td>
+                </tr>
+                <tr>
+                    <td><b>Recording File</b></td>
+                    <td><input type="file" name="recording_file" value="recording_file" /></td>
+                </tr>
+                <tr>
+                    <td><input type="Submit" name="submit" value="Add Recording"></td>
+                </tr>
+            </table>
+        </form>
+    <!--=========================== [ Matching_test ] =================================-->
+        <h1>Matching Test</h1>
+        <form action="/api/matching_test" method="post" enctype="multipart/form-data">
+            <table>
+                <tr>
+                    <td><b>Text</b></td>
+                    <td><input type="text" name="text" value="text" /></td>
+                </tr>
+                <tr>
+                    <td><b>File</b></td>
+                    <td><input type="file" name="rec_file" value="rec_file" /></td>
+                </tr>
+                <tr>
+                    <td><input type="Submit" name="submit" value="Submit"></td>
+                </tr>
+            </table>
+        </form>
+    </body>
+</html>
