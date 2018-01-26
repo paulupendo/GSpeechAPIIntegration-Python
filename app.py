@@ -2,7 +2,8 @@ import os
 import jwt
 import traceback
 import datetime
-from OpenSSL import SSL
+import subprocess
+# from OpenSSL import SSL
 from flask_cors import CORS
 from google_api import run_google_api
 from functools import wraps
@@ -67,7 +68,7 @@ def demo():
 @app.route('/api/get_demo', methods=['POST'])
 def get_demo():
     try:
-        print '======================', request.form
+        print('======================', request.form)
     except:
         pass
     return "hoo"
@@ -81,14 +82,14 @@ def user_registration():
         name = request.form['name']
         email = request.form['email']
         pswd = request.form['password']
-        pw_hash = bcrypt.generate_password_hash(pswd)
+        pw_hash = str(bcrypt.generate_password_hash(pswd, 10).decode('utf-8'))
         user = User(id, name, email, pw_hash)
         db.session.add(user)
         db.session.commit()
         ret['success'] = True
         ret['msg'] = 'User Registration successfully!'
     except Exception as exp:
-        print 'user_registration() :: Got exception: %s' % exp
+        print('user_registration() :: Got exception: %s' % exp)
         ret['success'] = False
         ret['msg'] = '%s' % exp
         print(traceback.format_exc())
@@ -109,15 +110,18 @@ def user_login():
             ret['success'] = False
             return jsonify(ret)
         password_db = query.password
+        print(password_db)
 
         # match password
         passw = bcrypt.check_password_hash(password_db, pswd)
+        print(passw)
 
         if passw:
+            print('password', passw)
 
             # generate token
             expiry = datetime.datetime.utcnow() + \
-                     datetime.timedelta(minutes=30)
+                datetime.timedelta(minutes=30)
             token = jwt.encode({'user': email, 'exp': expiry},
                                app.config['secretkey'], algorithm='HS256')
 
@@ -129,7 +133,7 @@ def user_login():
         ret['success'] = False
 
     except Exception as exp:
-        print 'user_login() :: Got exception: %s' % exp
+        print('user_login() :: Got exception: %s' % exp)
         ret['msg'] = '%s' % exp
         ret['err'] = 2
         print(traceback.format_exc())
@@ -142,7 +146,8 @@ def user_login():
 dir_path = os.path.dirname(os.path.realpath(__file__))
 file_path = '%s/%s' % (dir_path, 'uploads')
 UPLOAD_FOLDER = file_path
-ALLOWED_EXTENSION = set(['ogg', 'm4a', 'wav', 'mp3', 'txt', 'csv', 'png', 'jpg', 'gif', 'pdf'])
+ALLOWED_EXTENSION = set(['ogg', 'm4a', 'wav',
+                        'mp3', 'txt', 'csv', 'png', 'jpg', 'gif', 'pdf'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -154,7 +159,7 @@ def uploaded_file(filename):
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() \
-                               in ALLOWED_EXTENSION
+        in ALLOWED_EXTENSION
 
 
 @app.route('/api/add_study', methods=['POST'])
@@ -173,7 +178,7 @@ def add_study():
 
         save_csv_file_url = '%s/uploads/%s' % (prefix, filename)
     except Exception as exp:
-        print 'file() :: Got exception: %s' % exp
+        print('file() :: Got exception: %s' % exp)
         print(traceback.format_exc())
 
     return 'file uploads successfully'
@@ -182,7 +187,7 @@ def add_study():
 @app.route('/api/study')
 @token_required
 def study():
-
+    print("------------")
     ret = {}
     try:
         # count the no of lines
@@ -215,8 +220,9 @@ def study():
             AH_Conf = s[11]
             Speaker = s[12]
             study = Study(id, Paragraph_Number, Paragraph_Text, Date_of_Upload,
-                          Paragraph_Type, Word_Count, Status, GCS_Output, GCS_Acc,
-                          GCS_Conf, AH_Output, AH_Acc, AH_Conf, Speaker)
+                          Paragraph_Type, Word_Count, Status, GCS_Output,
+                          GCS_Acc, GCS_Conf, AH_Output, AH_Acc, AH_Conf,
+                          Speaker)
             db.session.add(study)
             db.session.commit()
             ret['success'] = True
@@ -292,7 +298,7 @@ def add_recording():
         ret['success'] = True
         ret['msg'] = 'recording added successfully'
     except Exception as exp:
-        print 'add_recording() :: Got excepion: %s' % exp
+        print('add_recording() :: Got excepion: %s' % exp)
         print(traceback.format_exc())
         ret['msg'] = '%s' % exp
         ret['success'] = False
@@ -314,7 +320,7 @@ def get_recording():
         ret['success'] = True
         ret['recordings'] = recordings
     except Exception as exp:
-        print 'get_recording() :: Got exception: %s' % exp
+        print('get_recording() :: Got exception: %s' % exp)
         print(traceback.format_exc())
         ret['success'] = False
         ret['error'] = '%s' % exp
@@ -325,7 +331,7 @@ def get_recording():
 def comparison():
     ret = {}
     audio = Recording.query.all()
-    print '', audio
+    print('', audio)
     google_data = run_google_api()
     # print "-------+++++++: [%s]" % google_data
     file1 = open('uploads/study.csv', 'r')
@@ -357,19 +363,22 @@ def matching_test():
         if rec_file and allowed_file(rec_file.filename):
             filename = secure_filename(rec_file.filename)
             rec_file.save(os.path.join(app.config
-                                             ['UPLOAD_FOLDER'], filename))
-            recording_path = '%s/%s' % (file_path, filename)
-            print 'recording_path', recording_path
+                                       ['UPLOAD_FOLDER'], filename))
+            subprocess.call(['./script.sh'])
+            recording_path = '%s/%s' % (file_path, "rec.flac")
+            print('recording_path', recording_path)
 
         save_recording_file_url = '%s/uploads/%s' % (prefix, filename)
-        print 'save_recording_path', save_recording_file_url
+        print('save_recording_path', save_recording_file_url)
         rec_text = run_google_api(recording_path)
-        print 'recording text:', rec_text
-        comparison = str(SequenceMatcher(None, text, rec_text).ratio() * 100)
+        transcribed_text = rec_text.results[0].alternatives[0].transcript
+        print(transcribed_text)
+        comparison = str(SequenceMatcher(
+                         None, text, transcribed_text).ratio() * 100)
         ret['Comparison_percentage'] = comparison
         ret['success'] = True
     except Exception as exp:
-        print 'matching_test() :: Got Exception: %s' % exp
+        print('matching_test() :: Got Exception: %s' % exp)
         print(traceback.format_exc())
         ret['msg'] = '%s' % exp
         ret['success'] = False
@@ -380,4 +389,3 @@ if __name__ == '__main__':
     port = int(os.environ.get('PORT', 8080))
     context = ('server.crt', 'server.key')
     app.run(host='0.0.0.0', port=port, debug=True, threaded=True)
-

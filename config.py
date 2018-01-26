@@ -12,7 +12,7 @@ class Config(object):
 
 class ProductionConfig(Config):
     DEBUG = False
-    DATABASE_URI = 'postgresql://speechapp:123@localhost/speechdb'
+    DATABASE_URI = 'postgresql://speechdb:123@localhost/speechdb'
 
 
 class StagingConfig(Config):
