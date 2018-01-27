@@ -1,7 +1,8 @@
 #
 # script for various ORM models for project
 #
-
+from flask_script import Manager
+from flask_migrate import Migrate, MigrateCommand
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -10,7 +11,7 @@ from sqlalchemy import ForeignKey
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'postgresql://speechapp:123@localhost/speechdb'
+    'postgresql://speechdb:123@localhost/speechdb'
 db = SQLAlchemy(app)
 
 
@@ -19,9 +20,9 @@ class User(db.Model):
     __tablename__ = 'user'
 
     id = db.Column(db.BigInteger, primary_key=True)
-    name = db.Column(db.String(90))
-    email = db.Column(db.String(90), unique=True)
-    password = db.Column(db.String(90))
+    name = db.Column(db.String(150))
+    email = db.Column(db.String(150), unique=True)
+    password = db.Column(db.String(1500))
     created_at = db.Column(db.TIMESTAMP,
                            default=datetime.utcnow, nullable=False)
 
@@ -135,10 +136,31 @@ class Recording(db.Model):
         }
 
 
-if __name__ == '__main__':
-    try:
+migrate = Migrate(app, db)
+manager = Manager(app)
+
+manager.add_command('db', MigrateCommand)
+
+
+@manager.command
+def dbinit():
         db.create_all()
-        print "===================== [db created] ====================="
-    except Exception as exp:
-        print "[Postgres Models] :: main() :: Got Exception: %s" % exp
-        print "===================== [db not created] ================="
+        print('All tables created.')
+
+
+@manager.command
+def dropdb():
+        db.drop_all()
+        print('All tables deleted.')
+
+
+if __name__ == '__main__':
+    manager.run()
+
+# if __name__ == '__main__':
+#     try:
+#         db.create_all()
+#         print("===================== [db created] =====================")
+#     except Exception as exp:
+#         print("[Postgres Models] :: main() :: Got Exception: %s" % exp)
+#         print("===================== [db not created] =================")
