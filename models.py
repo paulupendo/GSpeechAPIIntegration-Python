@@ -11,7 +11,7 @@ from sqlalchemy import ForeignKey
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'postgresql://speechdb:123@localhost/speechdb'
+    'postgresql://speechapp:@localhost/speechdb'
 db = SQLAlchemy(app)
 
 
@@ -34,7 +34,6 @@ class User(db.Model):
 
     @property
     def serialize(self):
-
         """ Return object data in easily serializeable format"""
         return {
             'id': self.id,
@@ -54,7 +53,7 @@ class Study(db.Model):
     Paragraph_Text = db.Column(db.String(1024))
     Date_of_Upload = db.Column(db.String(200))
     Paragraph_Type = db.Column(db.String(200))
-    Word_Count = db.Column(db.BigInteger)
+    Word_Count = db.Column(db.BigInteger, default=50)
     Status = db.Column(db.String(90))
     GCS_Output = db.Column(db.String(1024))
     GCS_Acc = db.Column(db.String(200))
@@ -86,7 +85,6 @@ class Study(db.Model):
 
     @property
     def serialize(self):
-
         """Return object data in easily serialzeable format"""
         return {
             'id': self.id,
@@ -126,7 +124,6 @@ class Recording(db.Model):
 
     @property
     def serialize(self):
-
         """Return object data in easily serialzeable format"""
         return {
             'id': self.id,
@@ -144,14 +141,14 @@ manager.add_command('db', MigrateCommand)
 
 @manager.command
 def dbinit():
-        db.create_all()
-        print('All tables created.')
+    db.create_all()
+    print('All tables created.')
 
 
 @manager.command
 def dropdb():
-        db.drop_all()
-        print('All tables deleted.')
+    db.drop_all()
+    print('All tables deleted.')
 
 
 if __name__ == '__main__':

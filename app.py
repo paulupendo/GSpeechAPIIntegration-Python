@@ -11,6 +11,7 @@ from difflib import SequenceMatcher
 from werkzeug.utils import secure_filename
 from flask import Flask, request, redirect, render_template, jsonify
 from flask.ext.bcrypt import Bcrypt
+import collections
 from models import app, db, User, Study, Recording
 
 bcrypt = Bcrypt(app)
@@ -147,7 +148,7 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 file_path = '%s/%s' % (dir_path, 'uploads')
 UPLOAD_FOLDER = file_path
 ALLOWED_EXTENSION = set(['ogg', 'm4a', 'wav',
-                        'mp3', 'txt', 'csv', 'png', 'jpg', 'gif', 'pdf'])
+                         'mp3', 'txt', 'csv', 'png', 'jpg', 'gif', 'pdf'])
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -165,6 +166,7 @@ def allowed_file(filename):
 @app.route('/api/add_study', methods=['POST'])
 def add_study():
     prefix = request.base_url[:-len('/add_study')]
+    print('HERE', request.files)
     try:
         csv_file = request.files['study_file']
 
@@ -187,7 +189,6 @@ def add_study():
 @app.route('/api/study')
 @token_required
 def study():
-    print("------------")
     ret = {}
     try:
         # count the no of lines
@@ -202,7 +203,6 @@ def study():
         line = csv_file.readline()
         cnt = 1
         while cnt < total_lines:
-
             line = csv_file.readline()
             s = line.split(',')
             id = s[0]
@@ -210,7 +210,7 @@ def study():
             Paragraph_Text = s[1]
             Date_of_Upload = s[2]
             Paragraph_Type = s[3]
-            Word_Count = s[4]
+            Word_Count = len(collections.Counter(s[1]))
             Status = s[5]
             GCS_Output = s[6]
             GCS_Acc = s[7]
