@@ -372,7 +372,8 @@ def matching_test():
         print('save_recording_path', save_recording_file_url)
         rec_text = run_google_api(recording_path)
         transcribed_text = rec_text.results[0].alternatives[0].transcript
-        print(transcribed_text)
+        print("TRANSCRIBED========", transcribed_text)
+        print("NORMAL========", text)
         comparison = str(SequenceMatcher(
                          None, text, transcribed_text).ratio() * 100)
         ret['Comparison_percentage'] = comparison
