@@ -54,7 +54,7 @@ class Study(db.Model):
     Date_of_Upload = db.Column(db.String(200))
     Paragraph_Type = db.Column(db.String(200))
     Word_Count = db.Column(db.BigInteger, default=50)
-    Status = db.Column(db.String(90))
+    Status = db.Column(db.String(90), default="Not Analyzed")
     GCS_Output = db.Column(db.String(1024))
     GCS_Acc = db.Column(db.String(200))
     GCS_Conf = db.Column(db.String(200))

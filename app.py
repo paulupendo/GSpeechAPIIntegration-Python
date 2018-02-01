@@ -166,9 +166,10 @@ def allowed_file(filename):
 @app.route('/api/add_study', methods=['POST'])
 def add_study():
     prefix = request.base_url[:-len('/add_study')]
-    print('HERE', request.files)
+
     try:
         csv_file = request.files['study_file']
+        print('HERE++++++++', csv_file.filename)
 
         if csv_file.filename == '':
             flash('Nop Selectd file')
@@ -371,13 +372,23 @@ def matching_test():
         save_recording_file_url = '%s/uploads/%s' % (prefix, filename)
         print('save_recording_path', save_recording_file_url)
         rec_text = run_google_api(recording_path)
+        confidence = (rec_text.results[0].alternatives[0].confidence)
         transcribed_text = rec_text.results[0].alternatives[0].transcript
-        print("TRANSCRIBED========", transcribed_text)
-        print("NORMAL========", text)
-        comparison = str(SequenceMatcher(
-                         None, text, transcribed_text).ratio() * 100)
-        ret['Comparison_percentage'] = comparison
-        ret['success'] = True
+        if transcribed_text:
+            comparison = str(SequenceMatcher(
+                             None, text, transcribed_text).ratio() * 100)
+
+            study = Study.query.filter_by(Paragraph_Text=text).first()
+            if study:
+                study.GCS_Output = transcribed_text
+                study.GCS_Acc = comparison[:4] + '%'
+                study.GCS_Conf = confidence
+                study.Status = 'Analyzed'
+                db.session.add(study)
+                db.session.commit()
+            ret['Comparison_percentage'] = comparison
+            ret['transcribed_text'] = transcribed_text
+            ret['success'] = True
     except Exception as exp:
         print('matching_test() :: Got Exception: %s' % exp)
         print(traceback.format_exc())
