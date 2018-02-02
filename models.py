@@ -11,7 +11,7 @@ from sqlalchemy import ForeignKey
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'postgresql://speechapp:@localhost/speechdb'
+    'postgresql://speechapp:123@localhost/speechdb'
 db = SQLAlchemy(app)
 
 
@@ -54,7 +54,7 @@ class Study(db.Model):
     Date_of_Upload = db.Column(db.String(200))
     Paragraph_Type = db.Column(db.String(200))
     Word_Count = db.Column(db.BigInteger, default=50)
-    Status = db.Column(db.String(90), default="Not Analyzed")
+    Status = db.Column(db.String(90), default="Uploaded")
     GCS_Output = db.Column(db.String(1024))
     GCS_Acc = db.Column(db.String(200))
     GCS_Conf = db.Column(db.String(200))

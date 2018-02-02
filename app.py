@@ -169,12 +169,12 @@ def add_study():
 
     try:
         csv_file = request.files['study_file']
-        print('HERE++++++++', csv_file.filename)
 
         if csv_file.filename == '':
             flash('Nop Selectd file')
             return redirect(request.url)
         if csv_file and allowed_file(csv_file.filename):
+            print("UPLOADING CSV")
             filename = secure_filename(csv_file.filename)
             csv_file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             csv = '%s/%s' % (file_path, filename)
@@ -192,6 +192,8 @@ def add_study():
 def study():
     ret = {}
     try:
+        Study.query.delete()
+        db.session.commit()
         # count the no of lines
         with open('uploads/study.csv') as f:
             for i, l in enumerate(f):
@@ -220,6 +222,7 @@ def study():
             AH_Acc = s[10]
             AH_Conf = s[11]
             Speaker = s[12]
+
             study = Study(id, Paragraph_Number, Paragraph_Text, Date_of_Upload,
                           Paragraph_Type, Word_Count, Status, GCS_Output,
                           GCS_Acc, GCS_Conf, AH_Output, AH_Acc, AH_Conf,
@@ -354,6 +357,8 @@ def matching_test():
 
     try:
         text = request.form['text']
+        textId = request.form['id']
+
         # recording uploads
         filename = ''
         rec_file = request.files['rec_file']
@@ -377,8 +382,9 @@ def matching_test():
         if transcribed_text:
             comparison = str(SequenceMatcher(
                              None, text, transcribed_text).ratio() * 100)
-
-            study = Study.query.filter_by(Paragraph_Text=text).first()
+            print("OUR ID", textId)
+            study = db.session.query(Study).filter_by(id=textId).first()
+            print("OUR STUDY", study)
             if study:
                 study.GCS_Output = transcribed_text
                 study.GCS_Acc = comparison[:4] + '%'
