@@ -214,7 +214,7 @@ def study():
             Date_of_Upload = s[2]
             Paragraph_Type = s[3]
             Word_Count = len(collections.Counter(s[1]))
-            Status = s[5]
+            Status = 'Uploaded'
             GCS_Output = s[6]
             GCS_Acc = s[7]
             GCS_Conf = s[8]
@@ -222,11 +222,13 @@ def study():
             AH_Acc = s[10]
             AH_Conf = s[11]
             Speaker = s[12]
+            Analysed_by = s[13]
+            Procedure = s[14]
 
             study = Study(id, Paragraph_Number, Paragraph_Text, Date_of_Upload,
                           Paragraph_Type, Word_Count, Status, GCS_Output,
                           GCS_Acc, GCS_Conf, AH_Output, AH_Acc, AH_Conf,
-                          Speaker)
+                          Speaker, Analysed_by, Procedure)
             db.session.add(study)
             db.session.commit()
             ret['success'] = True
@@ -262,6 +264,8 @@ def get_study_material():
             study['AH_Conf'] = data.AH_Conf
             study['Speaker'] = data.Speaker
             study['created_at'] = data.created_at
+            study['Analysed_by'] = data.Analysed_by
+            study['Procedure'] = data.Procedure
             studies.append(study)
         ret['success'] = True
         ret['studies'] = studies
@@ -358,6 +362,8 @@ def matching_test():
     try:
         text = request.form['text']
         textId = request.form['id']
+        user = request.form['user']
+        print('USER', user)
 
         # recording uploads
         filename = ''
@@ -389,7 +395,8 @@ def matching_test():
                 study.GCS_Output = transcribed_text
                 study.GCS_Acc = comparison[:4] + '%'
                 study.GCS_Conf = confidence
-                study.Status = 'Analyzed'
+                study.Status = 'Analysed'
+                study.Analysed_by = user
                 db.session.add(study)
                 db.session.commit()
             ret['Comparison_percentage'] = comparison

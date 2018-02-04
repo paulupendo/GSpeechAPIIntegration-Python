@@ -64,10 +64,12 @@ class Study(db.Model):
     Speaker = db.Column(db.String(200))
     created_at = db.Column(db.TIMESTAMP,
                            default=datetime.utcnow, nullable=False)
+    Analysed_by = db.Column(db.String(1024))
+    Procedure = db.Column(db.String(1024))
 
     def __init__(self, id, Paragraph_Number, Paragraph_Text, Date_of_Upload,
                  Paragraph_Type, Word_Count, Status, GCS_Output, GCS_Acc,
-                 GCS_Conf, AH_Output, AH_Acc, AH_Conf, Speaker):
+                 GCS_Conf, AH_Output, AH_Acc, AH_Conf, Speaker, Analysed_by, Procedure):
         self.id = id
         self.Paragraph_Number = Paragraph_Number
         self.Paragraph_Text = Paragraph_Text
@@ -82,6 +84,8 @@ class Study(db.Model):
         self.AH_Acc = AH_Acc
         self.AH_Conf = AH_Conf
         self.Speaker = Speaker
+        self.Analysed_by = Analysed_by
+        self.Procedure = Procedure
 
     @property
     def serialize(self):
@@ -101,7 +105,9 @@ class Study(db.Model):
             'AH_Acc': self.AH_Acc,
             'AH_Conf': self.AH_Conf,
             'Speaker': self.Speaker,
-            'created_at': self.created_at
+            'created_at': self.created_at,
+            'Analysed_by': self.Analysed_by,
+            'Procedure': self.Procedure
         }
 
 
